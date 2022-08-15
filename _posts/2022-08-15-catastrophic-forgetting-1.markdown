@@ -1,4 +1,8 @@
 ---
+layout: post
+title:  "Catastrophic Forgetting!"
+date:   2022-08-15 17:23:33 +0800
+categories: jekyll updates
 jupyter:
   jupytext:
     formats: ipynb,md
