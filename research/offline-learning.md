@@ -1,27 +1,13 @@
 ---
-layout: post
-title:  "Catastrophic Forgetting!"
-date:   2022-08-15 17:23:33 +0800
-categories: jekyll updates
-jupyter:
-  jupytext:
-    formats: ipynb,md
-    text_representation:
-      extension: .md
-      format_name: markdown
-      format_version: '1.3'
-      jupytext_version: 1.14.0
-  kernelspec:
-    display_name: Python 3 (ipykernel)
-    language: python
-    name: python3
+layout: page
+title:  "Catastrophic Forgetting in Offline Learning"
+categories: research
 ---
-
-# Catastrophic Forgetting In Offline Learning
 
 ## Introduction
 
 The phenomenon of catastrophic forgetting, or catastrophic interference, was first observed by McCloskey and Cohen (1989). It is especially salient in online learning, where training data is fed sequentially to a machine learning model for training. Of course, the phenomenon of catastrophic forgetting is also visible in offline learning. In the next experiment, we use a LeNet5 built with PyTorch to simulate this behavior and see just how catastrophic this forgetting phenomenon can be.
+
 
 ```python
 import torch
@@ -33,6 +19,7 @@ from torchvision import transforms
 from tqdm.notebook import tqdm
 from matplotlib import pyplot as plt
 ```
+
 
 ```python
 class LeNet(nn.Module):
@@ -63,6 +50,7 @@ class LeNet(nn.Module):
 ```
 
 The neural network will still train on a one hot vector of 10 classes (0 - 9), but we are going to not let it see the number 9 ever during initial training. Thus in PyTorch, we will have to create our custom dataset from MNIST with the filter.
+
 
 ```python
 class IncompleteMNIST(Dataset):
@@ -104,6 +92,7 @@ class IncompleteMNIST(Dataset):
         return self.transform(img), self.labels[idx]
 ```
 
+
 ```python
 trainset = IncompleteMNIST()
 valset = IncompleteMNIST(train=False)
@@ -114,7 +103,14 @@ print(f"{len(trainset)} training data")
 print(f"{len(valset)} validation data")
 ```
 
+    Image size: torch.Size([1, 32, 32])
+    label: 5
+    54051 training data
+    8991 validation data
+
+
 Now, we shall perform training on the data that was held out. First, let's set the training hyperparameters
+
 
 ```python
 # Setup training
@@ -139,6 +135,7 @@ val_loader = torch.utils.data.DataLoader(
 ```
 
 Next we build the inner training loop for one epoch.
+
 
 ```python
 def train(model, train_loader):
@@ -173,6 +170,7 @@ def train(model, train_loader):
 
 We also define an accuracy function and a validation inner loop, which will be useful even for later.
 
+
 ```python
 def calculate_error(logits, labels):
     # Calculate the error rate
@@ -180,6 +178,7 @@ def calculate_error(logits, labels):
     error_rate = (labels != predictions).sum() / len(labels)
     return error_rate
 ```
+
 
 ```python
 def validate(model, ValDataLoader):
@@ -198,6 +197,7 @@ def validate(model, ValDataLoader):
     
     return (avg_vloss, avg_verror)
 ```
+
 
 ```python
 # Epoch Training
@@ -233,7 +233,152 @@ for epoch in tqdm(range(num_epochs)):
         Validation error: {avg_verror:.3f}")
 ```
 
+
+      0%|          | 0/20 [00:00<?, ?it/s]
+
+
+
+      0%|          | 0/845 [00:00<?, ?it/s]
+
+
+    Train loss: 0.018,         Validation loss: 0.252,         Validation error: 0.076
+
+
+
+      0%|          | 0/845 [00:00<?, ?it/s]
+
+
+    Train loss: 0.015,         Validation loss: 0.200,         Validation error: 0.061
+
+
+
+      0%|          | 0/845 [00:00<?, ?it/s]
+
+
+    Train loss: 0.011,         Validation loss: 0.178,         Validation error: 0.054
+
+
+
+      0%|          | 0/845 [00:00<?, ?it/s]
+
+
+    Train loss: 0.009,         Validation loss: 0.154,         Validation error: 0.048
+
+
+
+      0%|          | 0/845 [00:00<?, ?it/s]
+
+
+    Train loss: 0.009,         Validation loss: 0.125,         Validation error: 0.038
+
+
+
+      0%|          | 0/845 [00:00<?, ?it/s]
+
+
+    Train loss: 0.007,         Validation loss: 0.123,         Validation error: 0.037
+
+
+
+      0%|          | 0/845 [00:00<?, ?it/s]
+
+
+    Train loss: 0.008,         Validation loss: 0.118,         Validation error: 0.035
+
+
+
+      0%|          | 0/845 [00:00<?, ?it/s]
+
+
+    Train loss: 0.007,         Validation loss: 0.099,         Validation error: 0.030
+
+
+
+      0%|          | 0/845 [00:00<?, ?it/s]
+
+
+    Train loss: 0.007,         Validation loss: 0.099,         Validation error: 0.030
+
+
+
+      0%|          | 0/845 [00:00<?, ?it/s]
+
+
+    Train loss: 0.006,         Validation loss: 0.095,         Validation error: 0.029
+
+
+
+      0%|          | 0/845 [00:00<?, ?it/s]
+
+
+    Train loss: 0.006,         Validation loss: 0.086,         Validation error: 0.025
+
+
+
+      0%|          | 0/845 [00:00<?, ?it/s]
+
+
+    Train loss: 0.005,         Validation loss: 0.085,         Validation error: 0.025
+
+
+
+      0%|          | 0/845 [00:00<?, ?it/s]
+
+
+    Train loss: 0.006,         Validation loss: 0.083,         Validation error: 0.025
+
+
+
+      0%|          | 0/845 [00:00<?, ?it/s]
+
+
+    Train loss: 0.004,         Validation loss: 0.080,         Validation error: 0.025
+
+
+
+      0%|          | 0/845 [00:00<?, ?it/s]
+
+
+    Train loss: 0.005,         Validation loss: 0.078,         Validation error: 0.024
+
+
+
+      0%|          | 0/845 [00:00<?, ?it/s]
+
+
+    Train loss: 0.004,         Validation loss: 0.069,         Validation error: 0.020
+
+
+
+      0%|          | 0/845 [00:00<?, ?it/s]
+
+
+    Train loss: 0.005,         Validation loss: 0.079,         Validation error: 0.023
+
+
+
+      0%|          | 0/845 [00:00<?, ?it/s]
+
+
+    Train loss: 0.004,         Validation loss: 0.079,         Validation error: 0.024
+
+
+
+      0%|          | 0/845 [00:00<?, ?it/s]
+
+
+    Train loss: 0.004,         Validation loss: 0.071,         Validation error: 0.022
+
+
+
+      0%|          | 0/845 [00:00<?, ?it/s]
+
+
+    Train loss: 0.004,         Validation loss: 0.063,         Validation error: 0.019
+
+
 We can see that the validation error drops quite significantly with each epoch. Now, assume that we realized the existance of "9", what should we do? One may think that we can just start feeding the model with the new samples, and ask it to learn on the "9", achieving some form of incremental improvement effect. Let's try it out.
+
 
 ```python
 # Instantiate a new dataset with only the samples of 9 in it
@@ -251,6 +396,10 @@ newtrainloader = torch.utils.data.DataLoader(
                 )
 ```
 
+    5949 training data
+
+
+
 ```python
 # For a sanity check, let's make sure this model can indeed classify 0 - 8
 model = model.to(device)
@@ -261,10 +410,16 @@ print(f"Validation loss: {vloss: .3f}")
 print(f"Validation error: {verror: .3f}")
 ```
 
+    Validation loss:  0.063
+    Validation error:  0.019
+
+
+
 ```python
 # Reinitialize optimizer
 optimizer = torch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 ```
+
 
 ```python
 # Next we train the model on one data point
@@ -300,6 +455,24 @@ for i, data in enumerate(newtrainloader):
 
 ```
 
+    Loss: 0.07043291628360748, Error: 0.022059453651309013
+    Loss: 0.1653931587934494, Error: 0.052111927419900894
+    Loss: 0.5302544236183167, Error: 0.18099762499332428
+    Loss: 1.018289566040039, Error: 0.3221302330493927
+    Loss: 1.696558952331543, Error: 0.4251136779785156
+    Loss: 2.256622076034546, Error: 0.5017015337944031
+    Loss: 3.026606798171997, Error: 0.6386767625808716
+    Loss: 4.104151248931885, Error: 0.7019382119178772
+    Loss: 5.45741081237793, Error: 0.7821078896522522
+    Loss: 7.039127349853516, Error: 0.8422807455062866
+    Loss: 8.854499816894531, Error: 0.9208633303642273
+    Loss: 10.747515678405762, Error: 0.9810433387756348
+    Loss: 12.626523971557617, Error: 0.9978944659233093
+    Loss: 14.398246765136719, Error: 0.9993350505828857
+    Error approximate to 1. Terminating...
+
+
+
 ```python
 from matplotlib import pyplot as plt
 
@@ -309,6 +482,20 @@ plt.xlabel("number of samples")
 plt.title("Error Rate")
 ```
 
+
+
+
+    Text(0.5, 1.0, 'Error Rate')
+
+
+
+
+    
+![png](files/offline-learning_19_1.png)
+    
+
+
+
 ```python
 plt.plot(losses)
 
@@ -317,12 +504,25 @@ plt.xlabel("number of samples")
 plt.title("Validation Loss")
 ```
 
-From the above experiment, we can see that if you sequentially feed a model with data that it has not seen before and ask it to train on it with SGD, the loss and error will monotonously increase with each new datapoint being trained on. This is much like the online case where the model seems to disregard what it has previously learned and overfit on the latest new data. Next, we should look into some possible solutions (albeit naive ones).
 
+
+
+    Text(0.5, 1.0, 'Validation Loss')
+
+
+
+
+    
+![png](files/offline-learning_20_1.png)
+    
+
+
+From the above experiment, we can see that if you sequentially feed a model with data that it has not seen before and ask it to train on it with SGD, the loss and error will monotonously increase with each new datapoint being trained on. This is much like the online case where the model seems to disregard what it has previously learned and overfit on the latest new data. Next, we should look into some possible solutions (albeit naive ones).
 
 ## Batch Replay
 
 One insight about continual learning is that humans don't just learn from new data. We compare and contrast with past memory of what we already know. We can try to replicate this by assuming a perfect memory (or storage) of past data, and we stochastically sample each batch to mix with the new incoming data. In the next part, we will implement such as batching mechanism.
+
 
 ```python
 # Reload a new trained model
@@ -334,9 +534,15 @@ print(f"Validation loss: {vloss: .3f}")
 print(f"Validation error: {verror: .3f}")
 ```
 
+    Validation loss:  0.063
+    Validation error:  0.019
+
+
+
 ```python
 optimizer = torch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 ```
+
 
 ```python
 # We need a new batching mechanism which mixes new data from 
@@ -397,12 +603,27 @@ for i, data in tqdm(enumerate(newtrainloader), total=len(newtrainloader)):
     
 ```
 
+
 ```python
 plt.plot(losses)
 plt.ylabel("loss")
 plt.xlabel("Batch number")
 plt.title("Validation Loss")
 ```
+
+
+
+
+    Text(0.5, 1.0, 'Validation Loss')
+
+
+
+
+    
+![png](files/offline-learning_26_1.png)
+    
+
+
 
 ```python
 plt.plot(errors)
@@ -411,7 +632,21 @@ plt.xlabel("number of samples")
 plt.title("Validation Error")
 ```
 
+
+
+
+    Text(0.5, 1.0, 'Validation Error')
+
+
+
+
+    
+![png](files/offline-learning_27_1.png)
+    
+
+
 With the batching strategy, the validation error and loss no longer monotonously increase when tested on the old validation set of samples with labels 0 - 8. We can also inspect how the model performs on samples of 9.
+
 
 ```python
 newvalset = IncompleteMNIST(holdout=False, train=False)
@@ -427,12 +662,23 @@ print(f"Validation loss: {loss.item():.3f}")
 print(f"Validation error: {error.item():.3f}")
 ```
 
+    1009 training data
+    Validation loss: 0.085
+    Validation error: 0.027
+
+
+
 ```python
 # This is the average for samples 0 - 8
 loss, error = validate(model, val_loader)
 print(f"Validation loss: {loss.item():.3f}")
 print(f"Validation error: {error.item():.3f}")
 ```
+
+    Validation loss: 0.086
+    Validation error: 0.027
+
+
 
 ```python
 # Sanity check
@@ -442,3 +688,7 @@ predicted_label = torch.argmax(torch.softmax(predict, dim=1))
 print(f"Predicted label: {predicted_label}")
 print(f"Actual label: {label}")
 ```
+
+    Predicted label: 9
+    Actual label: 9
+
